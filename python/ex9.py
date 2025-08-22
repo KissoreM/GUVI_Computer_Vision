@@ -1,16 +1,19 @@
 import cv2
 import matplotlib.pyplot as plt
 
-img = cv2.imread("image.jpg")
-gray = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
+img1 = cv2.imread('image.jpg')
+img2 = cv2.imread('image2.jpg')
 
-#SIFT
-sift = cv2.SIFT_create()
-keypoints, description = sift.detectAndCompute(gray,None)
+#ORB Keypoint Extractor
+orb = cv2.ORB_create()
+kp1, des1 = orb.detectAndCompute(img1,None)
+kp2, des2 = orb.detectAndCompute(img2,None)
 
-img_sift = cv2.drawKeypoints(img,keypoints,None,flags = 
-                             cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+Brute_force = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
+matches = Brute_force.match(des1, des2)
 
-plt.imshow(cv2.cvtColor(img_sift,cv2.COLOR_BGR2RGB))
-plt.axis("off")
+matches = sorted(matches, key=lambda x: x.distance)
+
+result = cv2.drawMatches(img1, kp1, img2, kp2, matches[:30],None,flags=2)
+plt.imshow(cv2.cvtColor(result,cv2.COLOR_BGR2RGB))
 plt.show()
